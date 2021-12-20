@@ -7,41 +7,50 @@
 #include <iostream>
 #include <sstream>
 #include <cmath>
+#include <windows.h>
 
 using namespace std;
 
 struct Data_Barang{
 	int id_barang;
 	char Nama_Barang[50], kategori_barang[50], jumlah_barang[50], data_sementara[50], Tgl[50], Waktu[50];
+	char tempNama_Barang[50], tempKategori_Barang[50], tempJumlah_Barang[50], tempTgl[50], tempWaktu[50];
 } Data_Now[50];
 
 //Fungsi Menu
-void lihat_data(int i, char kondisi[]), buat_data(int i), hapus_data(int index, int n, char kondisi[50]);
+void lihat_data(int i, char kondisi[], int n), buat_data(int i), hapus_data(int index, int n, char kondisi[50]);
 void barang_keluarMasuk(char kondisi[50], char data_utama[50]);
 int InsertionSort(char kondisi[50]), InterpolationSearch(int key, char kondisi[]);
 
 //Fungsi Pendukung Menu
-void ubah_data(int index, int n, char kondisi[50]), ambil_data(int i, char kondisi[50]), Tampilkan_Data(int i), masukkan_data(char data[], char File_name[]);
+void ubah_data(int index, int n, char kondisi[50], int position), ambil_data(int i, char kondisi[50]), Tampilkan_Data(int i), masukkan_data(char data[], char File_name[]);
 void copy_dataFile(char Data_File[], char Data_Folder[], char kondisi[], char data[]);
 int set_data(char kondisi[50]);
 
 //Fungsi Tambahan
-void set_time(char kondisi[]);
-int konversi_char(char data[]), membuka_data(char File_name[]);
+void set_time(char kondisi[]), garis(int x), gotoxy(int x, int y);
+int konversi_char(char data[]), membuka_data(char File_name[]), linear_search(char kondisi[], int key, int n, int position);
 string copy_dataFileString(char Data_File[], char Data_Folder[], char Type_Data[], int i);
 
 main(){
-	int pilih, key, index;
+	system("color 9F");
+	HWND hwnd = GetConsoleWindow();
+	if( hwnd != NULL){
+		MoveWindow(hwnd, 120, 50, 1080, 720, TRUE);
+	}
+	
+	int pilih, key, index, position;
 	char again='y', Data_Dicari[50], Masuk[50] = "/Masuk", Keluar[50] = "/Keluar", lihat_semua[50] = "/", pilih_1[50];
 	do
 	{
 		int n = set_data(lihat_semua);
 		system("cls");
-		printf("\t\t\n\n\n\t\t\t<----------------:MANAJEMEN GUDANG PERUSAHAAN RITEL:---------------->\n\n");
-		printf("\t\t 1. Barang Masuk\n\t\t 2. Barang Keluar\n\t\t 3. Tampilkan Data Barang\n\t\t 4. Cari Data Barang\n\t\t 5. Hapus Data Barang\n\t\t 6. Keluar\n\t\t Pilihan anda ? ");
+		gotoxy(30, 10);
+		printf("<----------------:MANAJEMEN GUDANG PERUSAHAAN RITEL:---------------->\n\n");
+		printf("\t\t 1. Barang Masuk\n\t\t 2. Barang Keluar\n\t\t 3. Tampilkan Data Barang\n\t\t 4. Cari Data Barang\n\t\t 5. Hapus Data Barang\n\t\t 6. Ubah Data Barang\n\t\t 7. Keluar\n\t\t Pilihan anda ? ");
 		scanf("%d", &pilih);
 		
-		if(pilih>6){
+		if(pilih>7){
 			system("cls");
 			printf("\t\t INPUT SALAH, COBA LAGI!!\n");
 			printf("\t\t Kembali ke menu [y/t] ?");
@@ -51,14 +60,15 @@ main(){
 		switch(pilih)
 		{
 			case 1:
-				system("cls");
-				printf("\t\t\n\n\n\t\t\t<----------------:Data Barang Masuk:---------------->\n\n");
+				gotoxy(15, 19);
+				garis(40);
 				printf("\t\t 1. Barang Baru \n\t\t 2. Barang Digudang \n\t\t Pilihan anda ?");
 				scanf("%d", &pilih);
 				
 				if( pilih == 1 ){
 					printf("\t\t Masukkan Jumlah Barang Yang DiInputkan: ");
 					scanf("%d", &index);
+					
 					buat_data(index);
 					printf("\t\t Data Berhasil Ditambahkan\n");
 				}else if(pilih == 2){
@@ -69,86 +79,149 @@ main(){
 				again=getch();
 				break;
 			case 2:
+				gotoxy(15, 19);
+				garis(40);
 				barang_keluarMasuk(Keluar, lihat_semua);
 				
 				printf("\t\t Kembali ke menu [y/t] ?");
 				again=getch();
 				break;
 			case 3:
-				printf("1. Riwayat Barang Masuk \n");
-				printf("2. Riwayat Barang Keluar \n");
-				printf("3. Tampilkan Data Barang Digudang \n");
-				
-				printf("Pilihan anda ?");
-				printf("Pilihan anda ?");
+				gotoxy(15, 19);
+				garis(40);
+				printf("\t\t 1. Riwayat Barang Masuk \n");
+				printf("\t\t 2. Riwayat Barang Keluar \n");
+				printf("\t\t 3. Tampilkan Data Barang Digudang \n");
+			
+				printf("\t\t Pilihan anda ?");
 				scanf("%d", &pilih);
 				
 				if( pilih == 1 ){
-					n = set_data(Masuk);
+					system("cls");
+					gotoxy(25, 1);
+					printf("<----------------:Data Barang Masuk:---------------->\n\n");
 					printf("Berikut Data Berdasarkan Id Barang: \n");
-					InsertionSort(Masuk);
-					printf("No\t Terakhir Diperbarui \t IdBarang\t NamaBarang\t\t Kategori\t Jumlah\t Status\n");
+					n = InsertionSort(Masuk);
+					printf("No\t Tanggal Input \t\t IdBarang\t NamaBarang\t\t   Kategori\t Jumlah\t Status\n");
 					for (int i = 1; i < n; i++){
-						lihat_data(i, Masuk);
+						lihat_data(i, Masuk, n);
 					}
 				}else if(pilih == 2){
-					n = set_data(Keluar);
+					system("cls");
+					gotoxy(25, 1);
+					printf("<----------------:Data Barang Keluar:---------------->\n\n");
 					printf("Berikut Data Berdasarkan Id Barang: \n");
-					InsertionSort(Keluar);
-					printf("No\t Terakhir Diperbarui \t IdBarang\t NamaBarang\t\t Kategori\t Jumlah\t Status\n");
+					n = InsertionSort(Keluar);
+					printf("No\t Terakhir Diperbarui \t IdBarang\t NamaBarang\t\t   Kategori\t Jumlah\t Status\n");
 					for (int i = 1; i < n; i++){
-						lihat_data(i, Keluar);
+						lihat_data(i, Keluar, n);
 					}
 				}else if(pilih == 3){
+					system("cls");
+					gotoxy(25, 1);
+					printf("<----------------:Data Barang:---------------->\n\n");
 					printf("Berikut Data Berdasarkan Id Barang: \n");
-					InsertionSort(lihat_semua);
-					printf("No\t Terakhir Diperbarui \t IdBarang\t NamaBarang\t\t Kategori\t Jumlah\t Status\n");
+					n = InsertionSort(lihat_semua);
+					printf("No\t Terakhir Diperbarui \t IdBarang\t NamaBarang\t\t   Kategori\t Jumlah\t Status\n");
 					for (int i = 1; i < n; i++){
-						lihat_data(i, lihat_semua);
+						lihat_data(i, lihat_semua, n);
 					}
 				}
 				printf("Kembali ke menu [y/t] ?");
 				again=getch();
 				break;
 			case 4:
-				printf("Masukkan Nama Barang: ");
+				printf("\t\t Masukkan Nama Barang: ");
 				scanf(" %[^\n]s ", Data_Dicari);
 				
+				n = strlen(Data_Dicari);
 				key = konversi_char(Data_Dicari);
+				position = 1;
+				
 				index = InterpolationSearch(key, lihat_semua);
 				
 				if(index != -1){
-					printf("Data Ditemukan\n");
+					printf("\t\t Data Ditemukan\n");
 					Tampilkan_Data(index);
 				}else{
-					printf("Data Tidak ada\n");
+					printf("\t\t Berikut Hasil Pencarian Yang Berhubungan Dengan - %s - :\n", Data_Dicari);
+					index = linear_search(lihat_semua, key, n, position);
+					if(index != 1){
+						printf("\t\t Data Tidak ada\n");
+					}
 				}
 				
-				printf("Kembali ke menu [y/t] ?");
+				printf("\t\t Kembali ke menu [y/t] ?");
 				again=getch();
 				break;
 			case 5:
-				printf("Masukkan Nama Barang: ");
+				printf("\t\t Masukkan Nama Barang: ");
 				scanf(" %[^\n]s ", Data_Dicari);
 				
 				key = konversi_char(Data_Dicari);
+				
+				n = InsertionSort(lihat_semua);
+				index = InterpolationSearch(key, lihat_semua);
+				
 				if(index != -1){
-					index = InterpolationSearch(key, lihat_semua);
+					printf("\t\t Proses..");
 					hapus_data(index, n, lihat_semua);
 					
-					index = InterpolationSearch(key, Masuk);
-					hapus_data(index, n, Masuk);
+					position = 2;
+					n = strlen(Data_Dicari);
+					index = linear_search(Masuk, key, n, position);
+					if(index == 1){
+						printf("..");
+					}
+					index = linear_search(Keluar, key, n, position);
+					if(index == 1){
+						printf("...");
+					}
 					
-					index = InterpolationSearch(key, Keluar);
-					hapus_data(index, n, Keluar);
-					printf("Hapus Data Berhasil\n");
+					printf("\n\t\t Hapus Data Berhasil\n");
 				}else{
-					printf("Data Tidak ada\n");
+					printf("\n\t\t Data Tidak ada\n");
 				}
-				printf("Kembali ke menu [y/t] ?");
+				
+				printf("\t\t Kembali ke menu [y/t] ?");
 				again=getch();
 				break;
 			case 6:
+				printf("\t\t Masukkan Nama Barang: ");
+				scanf(" %[^\n]s ", Data_Dicari);
+				
+				key = konversi_char(Data_Dicari);
+				
+				n = InsertionSort(lihat_semua);
+				index = InterpolationSearch(key, lihat_semua);
+				position = 0;
+				
+				if(index != -1){
+					printf("\t\t Data Ditemukan\n");
+					Tampilkan_Data(index);
+					ubah_data(index, n, lihat_semua, position);
+					
+					n = strlen(Data_Dicari);
+					index = linear_search(Masuk, key, n, position);
+					if(index == 1){
+						
+						printf("..");
+					}
+					
+					index = linear_search(Keluar, key, n, position);
+					if(index == 1){
+						printf("..");
+					}
+					
+					printf("\n\t\t Data Berhasil Diubah\n");
+				}else{
+					printf("\t\t Data Tidak ada\n");
+				}
+				
+				printf("\t\t Kembali ke menu [y/t] ?");
+				again=getch();
+				break;
+			case 7:
 				exit(0);
 				break;
 		}
@@ -162,18 +235,18 @@ void buat_data(int n){
 	
 	for(int i=0; i < n; i++)
 	{
-		printf("Nama Barang\t: ");
+		printf("\t\t Nama Barang\t: ");
 		scanf(" %[^\n]s ", &Data_Now[i].Nama_Barang);
 		masukkan_data(Data_Now[i].Nama_Barang, Data_Nama);
 		masukkan_data(Data_Now[i].Nama_Barang, Data_NamaM);
 		
 		
-		printf("Jumlah Barang\t: ");
+		printf("\t\t Jumlah Barang\t: ");
 		scanf("%s", &Data_Now[i].jumlah_barang);
 		masukkan_data(Data_Now[i].jumlah_barang, Data_Jumlah);
 		masukkan_data(Data_Now[i].jumlah_barang, Data_JumlahM);
 		
-		printf("KategoriBarang\t: ");
+		printf("\t\t KategoriBarang\t: ");
 		scanf(" %[^\n]s ", &Data_Now[i].kategori_barang);
 		masukkan_data(Data_Now[i].kategori_barang, Data_Kategori);
 		masukkan_data(Data_Now[i].kategori_barang, Data_KategoriM);
@@ -207,7 +280,7 @@ int membuka_data(char File_name[]){
 	File.close();
 	return i;
 }
-void lihat_data(int i, char kondisi[]){
+void lihat_data(int i, char kondisi[], int n){
 	char status[50];
 	int jumlah = atoi(Data_Now[i].jumlah_barang);
 	if (jumlah < 1){
@@ -222,14 +295,25 @@ void lihat_data(int i, char kondisi[]){
 		}
 	}
 	
-	int A = konversi_char(Data_Now[i].Nama_Barang), B = konversi_char(Data_Now[i].kategori_barang);
-	if(A<1100){
-		printf("%d\t %s  %s\t %d\t\t %s \t\t %s \t  %s  \t %s\n", i, Data_Now[i].Tgl, Data_Now[i].Waktu, Data_Now[i].id_barang, Data_Now[i].Nama_Barang, Data_Now[i].kategori_barang, Data_Now[i].jumlah_barang , status);
-	}else if (B<500){
-		printf("%d\t %s  %s\t %d\t\t %s \t %s \t\t  %s  \t %s\n", i, Data_Now[i].Tgl, Data_Now[i].Waktu, Data_Now[i].id_barang, Data_Now[i].Nama_Barang, Data_Now[i].kategori_barang, Data_Now[i].jumlah_barang , status);
+	int T_Text = 25;
+	int I_Text = strlen(Data_Now[i].Nama_Barang);
+	
+	int x = 50 + T_Text;
+	int y = i+4;
+	
+	printf("%d\t %s  %s\t %d\t\t ",  i, Data_Now[i].Tgl, Data_Now[i].Waktu, Data_Now[i].id_barang);
+	if(I_Text > T_Text-4){
+		for(int s = 0; s <= T_Text-5; s++){
+			printf("%c", Data_Now[i].Nama_Barang[s]);
+		}
+		printf("... ");
 	}else{
-		printf("%d\t %s  %s\t %d\t\t %s \t %s \t  %s  \t %s\n", i, Data_Now[i].Tgl, Data_Now[i].Waktu, Data_Now[i].id_barang, Data_Now[i].Nama_Barang, Data_Now[i].kategori_barang, Data_Now[i].jumlah_barang , status);
+		printf("%s ", Data_Now[i].Nama_Barang);
 	}
+	
+	gotoxy(x, y);
+	printf("%s \t  %s  \t %s\n", Data_Now[i].kategori_barang, Data_Now[i].jumlah_barang , status);
+	
 }
 void Tampilkan_Data(int i){
 	char status[50];
@@ -240,13 +324,13 @@ void Tampilkan_Data(int i){
 		strcpy(status, "Tersedia");
 	}
 	
-	printf("---------------------------------------\n");
-	printf("Id Barang\t: %d\n", Data_Now[i].id_barang);
-	printf("Last Update\t: %s - %s\n", Data_Now[i].Tgl, Data_Now[i].Waktu);
-	printf("Nama Barang\t: %s \nJumlah Barang\t: %s\n", Data_Now[i].Nama_Barang, Data_Now[i].jumlah_barang);
-	printf("Kategori\t: %s\n", Data_Now[i].kategori_barang);
-	printf("Status Barang\t: %s\n" , status);
-	printf("---------------------------------------\n");
+	printf("\t\t ---------------------------------------\n");
+	printf("\t\t Id Barang\t: %d\n", Data_Now[i].id_barang);
+	printf("\t\t Last Update\t: %s - %s\n", Data_Now[i].Tgl, Data_Now[i].Waktu);
+	printf("\t\t Nama Barang\t: %s \n\t\t Jumlah Barang\t: %s\n", Data_Now[i].Nama_Barang, Data_Now[i].jumlah_barang);
+	printf("\t\t Kategori\t: %s\n", Data_Now[i].kategori_barang);
+	printf("\t\t Status Barang\t: %s\n" , status);
+	printf("\t\t ---------------------------------------\n");
 }
 int set_data(char kondisi[50]){
 	char Data_Nama[50] = "/Data_Nama.txt", Data_File[50] = "Data";
@@ -321,7 +405,7 @@ int InterpolationSearch(int key, char kondisi[50]){
     }
 	return -1;
 }
-void ubah_data(int index, int n, char kondisi[50]){
+void ubah_data(int index, int n, char kondisi[50], int position){
 	char Masuk[50] = "/Masuk", Keluar[50] = "/Keluar", lihat_semua[50] = "/";
 	char Data_Folder[50] = "Data", Data_Nama[50] = "/Data_Nama.txt", Data_Jumlah[50] = "/Data_Jumlah.txt", Data_File[50];
 	char Data_Kategori[50] = "/Data_Kategori.txt", Data_Tgl[50] = "/Data_Tgl.txt", Data_Waktu[50] = "/Data_Waktu.txt";
@@ -348,53 +432,90 @@ void ubah_data(int index, int n, char kondisi[50]){
 	strcat(Data_File, Data_Waktu);
 	DN = fopen(Data_File, "w");
 	
-	printf("Kondisi: %s\n", kondisi);
 	if (strcmp(kondisi, Keluar) == 0){
+		for(int i = 1; i < n; i++){
+			copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
+			copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+			copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
+			copy_dataFile(Data_File, Data_Folder, Data_Tgl, Data_Now[i].Tgl);
+			copy_dataFile(Data_File, Data_Folder, Data_Waktu, Data_Now[i].Waktu);
+		}
 		n = InsertionSort(lihat_semua);
 	}
 	for(int i = 1; i < n; i++){
 		if(i == index){
-			if(strcmp(kondisi, lihat_semua) == 0 && Data_Now[index].id_barang == 0){
-				printf("Nama Barang: ");
+			if(strcmp(kondisi, lihat_semua) == 0 && position == 0){
+				
+				printf("\t\t Nama Barang: ");
 				scanf(" %[^\n]s ", &Data_Now[i].Nama_Barang);
 				copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
 				
-				printf("Jumlah Barang: ");
+				printf("\t\t Jumlah Barang: ");
 				scanf("%s", &Data_Now[i].jumlah_barang);
 				copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
 				
-				printf("KategoriBarang\t: ");
+				printf("\t\t KategoriBarang\t: ");
 				scanf(" %[^\n]s ", &Data_Now[i].kategori_barang);
 				copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
 				
 				set_time(kondisi);
-			}else if(strcmp(kondisi, Masuk) == 0){
-				printf("N a: %d\n", n);
-				strcpy(Data_Now[n].jumlah_barang, Data_Now[i].jumlah_barang);
-				strcpy(Data_Now[n].Nama_Barang, Data_Now[i].Nama_Barang);
-				strcpy(Data_Now[n].kategori_barang, Data_Now[i].kategori_barang);
-				strcpy(Data_Now[n].Tgl, Data_Now[i].Tgl);
-				strcpy(Data_Now[n].Waktu, Data_Now[i].Waktu);
-				n++;
-				printf("N r: %d\n", n);
-				//Data Baru
-				printf("Jumlah Barang: ");
-				scanf("%s", &Data_Now[i].jumlah_barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
 				
-				copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Tgl, Data_Now[i].Tgl);
-				copy_dataFile(Data_File, Data_Folder, Data_Waktu, Data_Now[i].Waktu);
-			}else if(strcmp(kondisi, Keluar) == 0){
-				printf("Jumlah Barang: ");
-				scanf("%s", &Data_Now[i].jumlah_barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+				strcpy(Data_Now[0].tempNama_Barang, Data_Now[i].Nama_Barang);
+				strcpy(Data_Now[0].tempKategori_Barang, Data_Now[i].kategori_barang);
+				strcpy(Data_Now[0].tempJumlah_Barang, Data_Now[i].jumlah_barang);
+			}else if(strcmp(kondisi, Masuk) == 0){
+				if(position == 1){
+					strcpy(Data_Now[n].jumlah_barang, Data_Now[i].jumlah_barang);
+					strcpy(Data_Now[n].Nama_Barang, Data_Now[i].Nama_Barang);
+					strcpy(Data_Now[n].kategori_barang, Data_Now[i].kategori_barang);
+					strcpy(Data_Now[n].Tgl, Data_Now[i].Tgl);
+					strcpy(Data_Now[n].Waktu, Data_Now[i].Waktu);
+					n++;
 					
-				copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
-				copy_dataFile(Data_File, Data_Folder, Data_Tgl, Data_Now[i].Tgl);
-				copy_dataFile(Data_File, Data_Folder, Data_Waktu, Data_Now[i].Waktu);
+					//Data Baru
+					printf("\t\t <----Barang Masuk--->\n");
+					printf("\t\t Jumlah Barang: ");
+					scanf("%s", &Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+					
+					copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
+					set_time(Masuk);
+				}else{
+					printf("\t\t <----Barang Masuk--->\n");
+					printf("\t\t Data Jumlah Masuk Sebelumnya: %s\n", Data_Now[i].jumlah_barang);
+					printf("\t\t Jumlah Barang: ");
+					scanf("%s", &Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Tgl, Data_Now[i].Tgl);
+					copy_dataFile(Data_File, Data_Folder, Data_Waktu, Data_Now[i].Waktu);
+					
+					copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[0].tempNama_Barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[0].tempKategori_Barang);
+				}
+			}else if(strcmp(kondisi, Keluar) == 0){
+				if(position == 1){
+					printf("\t\t <----Barang Keluar--->\n");
+					printf("\t\t Jumlah Barang: ");
+					scanf("%s", &Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+						
+					copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[i].kategori_barang);
+					set_time(Keluar);
+				}else{
+					printf("\t\t <----Barang Keluar--->\n");
+					printf("\t\t Data Jumlah Keluar Sebelumnya: %s\n", Data_Now[i].jumlah_barang);
+					printf("\t\t Jumlah Barang: ");
+					scanf("%s", &Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Tgl, Data_Now[i].Tgl);
+					copy_dataFile(Data_File, Data_Folder, Data_Waktu, Data_Now[i].Waktu);
+					
+					copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[0].tempNama_Barang);
+					copy_dataFile(Data_File, Data_Folder, Data_Kategori, Data_Now[0].tempKategori_Barang);
+				}
+				
 			}else{
 				copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
 				copy_dataFile(Data_File, Data_Folder, Data_Jumlah, Data_Now[i].jumlah_barang);
@@ -450,9 +571,6 @@ void hapus_data(int index, int n, char kondisi[50]){
 	strcat(Data_File, Data_Waktu);
 	DN = fopen(Data_File, "w");
 	
-	if (strcmp(kondisi, "/Keluar") == 0){
-		n = InsertionSort(kondisi);
-	}
 	for(int i = 1; i < n; i++){
 		if(i != index){
 			copy_dataFile(Data_File, Data_Folder, Data_Nama, Data_Now[i].Nama_Barang);
@@ -503,25 +621,25 @@ void barang_keluarMasuk(char kondisi[50], char data_utama[50]){
 	char Data_Kategori[50] = "/Data_Kategori.txt", Data_Tgl[50] = "/Data_Tgl.txt", Data_Waktu[50] = "/Data_Waktu.txt";
 	strcat(Data_Folder, kondisi);
 	
-	printf("Masukkan Nama Barang: ");
+	printf("\t\t Masukkan Nama Barang: ");
 	scanf(" %[^\n]s ", &Data_Dicari);
 			
 	key = konversi_char(Data_Dicari);
-	printf("%d\n", key);
 	index = InterpolationSearch(key, data_utama);
 				
 	if(index != -1){
-		printf("Data Ditemukan\n");
+		printf("\t\t Data Ditemukan\n");
 		Tampilkan_Data(index);
 		int jumlah = atoi(Data_Now[index].jumlah_barang);
+		int position = 1;
 		
 		n = InsertionSort(kondisi);
-		ubah_data(index, n, kondisi);
+		ubah_data(index, n, kondisi, position);
 		int jumlah_N = atoi(Data_Now[index].jumlah_barang);
 		
 		n = InsertionSort(data_utama);
 		if(strcmp(kondisi, Masuk) == 0){
-			printf("Barang telah Masuk\n");
+			printf("\t\t Barang telah Masuk\n");
 			jumlah = jumlah + jumlah_N;
 			stringstream ss;
 			ss << jumlah;
@@ -530,7 +648,7 @@ void barang_keluarMasuk(char kondisi[50], char data_utama[50]){
 			Data_Now[index].id_barang = konversi_char(Data_Now[index].Nama_Barang);
 		}else if (strcmp(kondisi, Keluar) == 0){
 			jumlah = jumlah - jumlah_N;
-			printf("Barang telah Keluar\n");
+			printf("\t\t Barang telah Keluar\n");
 			
 			if(jumlah < 1){
 				jumlah = 0;
@@ -542,13 +660,12 @@ void barang_keluarMasuk(char kondisi[50], char data_utama[50]){
 			
 			Data_Now[index].id_barang = konversi_char(Data_Now[index].Nama_Barang);
 		}else{
-			printf("gagal");
+			printf("\t\t gagal");
 		}
 		
-		ubah_data(index, n, data_utama);
-		printf("%s\n", data_utama);
+		ubah_data(index, n, data_utama, position);
 	}else{
-		printf("Data Tidak ada\n");
+		printf("\t\t Data Tidak ada\n");
 	}
 	
 }
@@ -567,4 +684,45 @@ void set_time(char kondisi[]){
 	
 	copy_dataFile(Data_File, Data_Folder, Data_Tgl, Tgl);
 	copy_dataFile(Data_File, Data_Folder, Data_Waktu, waktu);
+}
+void gotoxy(int x, int y) {
+    COORD coord;
+    coord.X = x;
+    coord.Y = y;
+    SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
+}
+void garis(int x) {
+	int z;
+	for(z = 0; z < x; z++) {
+		printf("=");
+	}
+	printf("\n");
+}
+int linear_search(char kondisi[], int key, int n, int position){
+	int legth = InsertionSort(kondisi);
+	int prev = 1;
+	
+	int i_data, hasil, flag = 0;
+	while(prev <= legth-1){
+		for(int i=0; i < n; i++){
+			i_data = Data_Now[prev].Nama_Barang[i];
+			hasil = hasil + i_data;
+		}
+		if(hasil == key){
+			if(position == 0){
+				ubah_data(prev, legth, kondisi, position);
+			}else if( position == 1){
+				Tampilkan_Data(prev);
+			}else if (position == 2){
+				hapus_data(prev, legth, kondisi);
+			}
+			
+			hasil = 0;
+			flag = 1;
+		}else{
+			hasil = 0;
+		}
+		prev++;
+	}
+	return flag;
 }
