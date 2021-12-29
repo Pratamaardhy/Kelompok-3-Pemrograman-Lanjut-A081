@@ -2,12 +2,16 @@
 ###  Judul project akhir : Manajemen Ware House perusahaan ritel
 ###  Gambar screenshot aplikasi
 ![image](https://user-images.githubusercontent.com/67818281/147575072-601a6a64-28de-469e-addf-bdbc208e5160.png)
+![image](https://user-images.githubusercontent.com/67818281/147684795-6b34dc78-068e-4d5f-b8a0-cec3f3faec16.png)
+![image](https://user-images.githubusercontent.com/67818281/147684856-df76736c-1b11-4b1b-998b-791cf4846cda.png)
+
+
 
 ### Nama anggota kelompok :
 
-   * Gede Ardi Pratama ( 20081010018) 
-   * Syukur Iman Attaqwa (20081010026) @SyukurIman
-   * Mohammad Daniel S.K (20081010059)
+   * Gede Ardi Pratama ( 20081010018) [@Pratamaardhy](https://github.com/Pratamaardhy)
+   * Syukur Iman Attaqwa (20081010026) [@SyukurIman](https://github.com/SyukurIman)
+   * Mohammad Daniel S.K (20081010059) [@D220K](https://github.com/D20K)
 
  ### Deskripsi project akhir
      
@@ -50,6 +54,11 @@
          > Data_Waktu.txt
   
   ### Metode yang diterapkan
+   1. Pointer 
+   2. Insertion sort
+   3. Linear search
+   4. Recursive
+   5. File Input and Output
   
   ### List menu yang ditawarkan
    1. Barang Masuk
