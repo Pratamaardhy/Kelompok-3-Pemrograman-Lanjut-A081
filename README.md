@@ -74,4 +74,32 @@
    8. Pilihan anda?
   
   ### Cara penggunaan aplikasi
-
+      * Pada tampilan utama diarahkan untuk memilih Menu yang diinginkan, dengan cara menekan tombol atas dan bawah
+      * Jika memilih Menu Barang masuk ( nomor 1 ), maka terdapat sub menu:
+        > Barang Baru
+        > Barang Digudang
+        Menu ini bertujuan untuk input data barang masuk
+        
+      * Jika memilih Menu Barang keluar ( nomor 2 ), maka terdapat arahan:
+        > masukkan Nama Barang,kemudian data akan dicari
+         Menu ini bertujuan untuk mengetahui data barang keluar
+         
+      * Jika memilih Menu Tampilkan Data Barang ( nomor 3 ), maka terdapat sub menu:
+        > Riwayat Barang Masuk
+        > Riwayat Barang Keluar
+        > Tampilkan Data Barang Digudang
+        Menu ini bertujuan untuk mengetahui informasi data barang
+        
+      * Jika memilih Menu Cari Data Barang ( nomor 4 ), maka terdapat arahan:
+        > masukkan Nama Barang,kemudian data akan dicari
+        Menu ini bertujuan untuk mengetahui informasi barang
+      
+      * Jika memilih Menu Hapus Data Barang ( nomor 5 ), maka terdapat arahan:
+        > masukkan Nama Barang,kemudian data akan dihapus
+        Menu ini bertujuan untuk menghapus informasi barang
+       
+      * Jika memilih Menu Ubah Data Barang ( nomor 6 ), maka terdapat arahan:
+        > masukkan Nama Barang,kemudian data akan diubah
+        Menu ini bertujuan untuk mengubah informasi barang
+       
+      * Jika memilih Menu Keluar ( nomor 6 ), maka program selesai:
