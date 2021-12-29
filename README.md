@@ -5,8 +5,8 @@
 
 ### Nama anggota kelompok :
 
-   * Gede Ardi Pratama ( 20081010018)
-   * Syukur Iman Attaqwa (20081010026)
+   * Gede Ardi Pratama ( 20081010018) 
+   * Syukur Iman Attaqwa (20081010026) @SyukurIman
    * Mohammad Daniel S.K (20081010059)
 
  ### Deskripsi project akhir
